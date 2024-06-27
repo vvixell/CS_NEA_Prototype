@@ -5,11 +5,11 @@ using System.Linq;
 
 public static class PerlinNoise
 {
-    public static float[,] CreateNoiseMap(Vector2Int Size, NoiseSettings settings)
+    public static float[,] CreateNoiseMap(int Seed, Vector2Int Size, NoiseSettings settings)
     {
         float[,] noiseMap = new float[Size.x, Size.y];
 
-        System.Random rng = new System.Random(settings.Seed);
+        System.Random rng = new System.Random(Seed);
 
         Vector2[] offsets = new Vector2[settings.Octaves];
         for (int i = 0; i < settings.Octaves; i++)
@@ -57,9 +57,9 @@ public static class PerlinNoise
         return noiseMap;
     }
 
-    public static float PointValue01(Vector2 position, NoiseSettings settings)
+    public static float PointValue01(int Seed, Vector2 position, NoiseSettings settings)
     {
-        System.Random rng = new System.Random(settings.Seed);
+        System.Random rng = new System.Random(Seed);
 
         Vector2[] offsets = new Vector2[settings.Octaves];
         for (int i = 0; i < settings.Octaves; i++)
@@ -143,7 +143,6 @@ public static class PerlinNoise
 [System.Serializable]
 public class NoiseSettings
 {
-    public int Seed;
     public float Scale;
     public int Octaves;
     public float Persistence;

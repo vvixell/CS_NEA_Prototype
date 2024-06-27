@@ -328,13 +328,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196e1684433ccc04dafcb1b980ba2c0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapSize: 1000
-  Seed: 64
-  CloseDBC: 10
+  MapSize: 2000
+  Seed: 12412
+  CloseDBC: 5
   FarDBC: 50
-  MaximumSamplingTries: 10000
+  CandidatePointAmount: 10
   settings:
-    Seed: 2
+    Seed: 5
     Scale: 100
     Octaves: 1
     Persistence: 0.5
