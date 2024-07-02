@@ -91,7 +91,7 @@ public static class DiscSampling
         }
     }
 
-    public static bool IsPositionValid(Point point, List<Point>[,] Grid, int[] Radii)
+    private static bool IsPositionValid(Point point, List<Point>[,] Grid, int[] Radii)
     {
         int gridX = Mathf.FloorToInt(point.Position.x / Radii[0]) + Grid.GetLength(0) / 2;
         int gridY = Mathf.FloorToInt(point.Position.y / Radii[0]) + Grid.GetLength(1) / 2;
@@ -104,16 +104,17 @@ public static class DiscSampling
         }
         return true;
     }
-}
 
-public struct Point
-{
-    public Vector2 Position;
-    public float Radius;
-
-    public Point(Vector2 Position, float Radius)
+    private struct Point
     {
-        this.Position = Position;
-        this.Radius = Radius;
+        public Vector2 Position;
+        public float Radius;
+
+        public Point(Vector2 Position, float Radius)
+        {
+            this.Position = Position;
+            this.Radius = Radius;
+        }
     }
 }
+
