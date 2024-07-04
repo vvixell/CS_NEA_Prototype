@@ -4,31 +4,26 @@ using UnityEngine;
 
 public class GraphGenerator : MonoBehaviour
 {
+    [Header("Visuals")]
     public float PointScale;
 
-    public int MapSize;
-
+    [Header("Graph Settings")]
     public int Seed;
-
-    public int CloseDBC; //DBC - Distance between caverns
-    public int FarDBC;
-
-    public int CandidatePointAmount;
-
-    public NoiseSettings settings;
+    public int GraphSize;
+    public int CavernCount;
+    public int DistanceBetweenCaverns;
 
     public SpriteRenderer rend;
     public LineRenderer line;
 
-    public Vector2[] Points;
-
     void Start()
     {
+        Vector2[] Points = DiscSampling.GeneratePoints(Seed, new NoiseSettings(1000, 1, 0.5f, 2f), GraphSize, new int[] { DistanceBetweenCaverns / 2, DistanceBetweenCaverns });
         
-        Vector2[] Points = DiscSampling.GeneratePoints(Seed, settings, MapSize, new int[] { CloseDBC, FarDBC });
         int[][] Edges = DelaunayTriangulation.Triangulate(Points);
 
-        
+        int[] EdgeWeights = RandomEdgeWeights.GetEdgeWeights(Seed, Edges.Length);
+
         for (int i = 0; i < Points.Length; i++)
         {
             GameObject point = new GameObject($"{i} , {Points[i]}");
@@ -41,17 +36,21 @@ public class GraphGenerator : MonoBehaviour
 
         for (int i = 0; i < Edges.Length; i++)
         {
-            Debug.Log(Edges[i].Length);
-            Vector2 A = Points[Edges[i][0]];
-            Vector2 B = Points[Edges[i][1]];
-            GameObject edge = new GameObject($"{Edges[i][0]} - {Edges[i][1]}");
+            int[] Vertices = Edges[i];
+            Vector2 A = Points[Vertices[0]]; 
+            Vector2 B = Points[Vertices[1]];
+
+            GameObject edge = new GameObject($"{Vertices[0]} - {Vertices[1]}");
+
             edge.transform.position = new Vector2((A.x + B.x) / 2f, (A.y + B.y) / 2f);
-            LineRenderer lineRenderer = edge.AddComponent<LineRenderer>();
-            lineRenderer.positionCount = 2;
-            lineRenderer.SetPosition(0, A);
-            lineRenderer.SetPosition(1, B);
-            lineRenderer.material = line.material;
-            lineRenderer.startWidth = line.startWidth;
+
+            LineRenderer l = edge.AddComponent<LineRenderer>();
+
+            l.positionCount = 2;
+            l.material = line.material;
+            l.startWidth = line.startWidth;
+
+            l.SetPositions(new Vector3[] { A, B });
         }
     }
 

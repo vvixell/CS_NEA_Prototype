@@ -147,4 +147,12 @@ public class NoiseSettings
     public int Octaves;
     public float Persistence;
     public float Lacunarity;
+
+    public NoiseSettings(float Scale, int Octaves, float Persistence, float Lacunarity)
+    {
+        this.Scale = Scale;
+        this.Octaves = Octaves;
+        this.Persistence = Persistence;
+        this.Lacunarity = Lacunarity;
+    }
 }
