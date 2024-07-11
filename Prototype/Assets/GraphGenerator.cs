@@ -19,7 +19,9 @@ public class GraphGenerator : MonoBehaviour
     void Start()
     {
         Vector2[] Points = DiscSampling.GeneratePoints(Seed, new NoiseSettings(1000, 1, 0.5f, 2f), GraphSize, new int[] { DistanceBetweenCaverns / 2, DistanceBetweenCaverns });
-        
+
+        Vector2[] Caverns = DeleteRandomNodes.GetNewPoints(Seed, CavernCount, Points);
+
         int[][] Edges = DelaunayTriangulation.Triangulate(Points);
 
         int[] EdgeWeights = RandomEdgeWeights.GetEdgeWeights(Seed, Edges.Length);
