@@ -2,17 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Djikstras : MonoBehaviour
+public static class Djikstras
 {
-    // Start is called before the first frame update
-    void Start()
+    public int[] FindPath(int[][] AdjacencyList, int[] EdgeWeights)
     {
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    }   
 }
