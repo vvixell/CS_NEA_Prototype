@@ -5,38 +5,40 @@ using System.Linq;
 
 public static class DelaunayTriangulation
 {
-    public static int[][] Triangulate(Vector2[] points)
+    public static int[][] Triangulate(Vector2[] positions)
     {
         List<Triangle> triangles = new List<Triangle>();
+        List<Point> points = new List<Point> ();
 
-        Triangle superTriangle = FindSuperTriagle(points);
+        Triangle superTriangle = FindSuperTriagle(positions, ref points);
         triangles.Add(superTriangle);
 
-        for (int i = 0; i < points.Length; i++)
+        for (int i = 0; i < positions.Length; i++)
         {
-            Vector2 point = points[i];
+            Point point = new Point(points[i], i);
+            points.Add(point);
 
             List<Triangle> encompassingTriangles = new List<Triangle>();
 
             foreach (Triangle triangle in triangles)
             {
-                float distance = Mathf.Sqrt(Mathf.Pow(point.x - triangle.Circumcenter.x, 2) + Mathf.Pow(point.y - triangle.Circumcenter.y, 2));
+                float distance = Mathf.Sqrt(Mathf.Pow(point.Position.x - triangle.Circumcenter.x, 2) + Mathf.Pow(point.Position.y - triangle.Circumcenter.y, 2));
                 if (distance < triangle.Radius)
                     encompassingTriangles.Add(triangle);
             }
 
             
-            List<Vector2[]> newPolygon = new List<Vector2[]>();
+            List<Point[]> newPolygon = new List<Point[]>();
 
             foreach (Triangle triangle in encompassingTriangles)
             {
-                Vector2[][] trianglesEdges = new Vector2[][] {
-                    new Vector2[] { triangle.Vertices[0], triangle.Vertices[1] },
-                    new Vector2[] { triangle.Vertices[1], triangle.Vertices[2] },
-                    new Vector2[] { triangle.Vertices[2], triangle.Vertices[0] }
+                Point[][] trianglesEdges = new Point[][] {
+                    new Point[] { triangle.Vertices[0], triangle.Vertices[1] },
+                    new Point[] { triangle.Vertices[1], triangle.Vertices[2] },
+                    new Point[] { triangle.Vertices[2], triangle.Vertices[0] }
                 };
 
-                foreach (Vector2[] edge in trianglesEdges)
+                foreach (Point[] edge in trianglesEdges)
                 {
                     bool EdgeIsShared = false;
 
@@ -44,13 +46,13 @@ public static class DelaunayTriangulation
                     {
                         if (otherTriangle.Equals(triangle)) continue;
 
-                        Vector2[][] otherTriangleEdges = new Vector2[][] {
-                            new Vector2[] { otherTriangle.Vertices[0], otherTriangle.Vertices[1] },
-                            new Vector2[] { otherTriangle.Vertices[1], otherTriangle.Vertices[2] },
-                            new Vector2[] { otherTriangle.Vertices[2], otherTriangle.Vertices[0] }
+                        Point[][] otherTriangleEdges = new Point[][] {
+                            new Point[] { otherTriangle.Vertices[0], otherTriangle.Vertices[1] },
+                            new Point[] { otherTriangle.Vertices[1], otherTriangle.Vertices[2] },
+                            new Point[] { otherTriangle.Vertices[2], otherTriangle.Vertices[0] }
                         };
 
-                        foreach (Vector2[] otherTriangleEdge in otherTriangleEdges)
+                        foreach (Point[] otherTriangleEdge in otherTriangleEdges)
                         {
                             if ((edge[0] == otherTriangleEdge[0] && edge[1] == otherTriangleEdge[1]) || (edge[0] == otherTriangleEdge[1] && edge[1] == otherTriangleEdge[0]))
                             {
@@ -67,52 +69,46 @@ public static class DelaunayTriangulation
             foreach (Triangle triangle in encompassingTriangles)
                 triangles.Remove(triangle);
 
-            foreach (Vector2[] edge in newPolygon)
+            foreach (Point[] edge in newPolygon)
                 triangles.Add(new Triangle(edge[0], edge[1], point));
         }
 
         foreach (Triangle triangle in triangles.ToArray())
             if (triangle.SharesVertex(superTriangle)) triangles.Remove(triangle);
 
-        List<int[]> edges = new List<int[]>();
+        List<int>[] AdjacencyList = new List<int>[points.Length];
+        foreach(List<int> list in AdjacencyList)
+            list = new List<int>();
+
         foreach (Triangle triangle in triangles)
         {
-            int indexA = points.ToList().IndexOf(triangle.Vertices[0]);
-            int indexB = points.ToList().IndexOf(triangle.Vertices[1]);
-            int indexC = points.ToList().IndexOf(triangle.Vertices[2]);
+            int A = triangle.Vertices[0].Index;
+            int B = triangle.Vertices[1].Index;
+            int C = triangle.Vertices[2].Index;
 
-            int[][] triangleEdges = new int[][]
-            {
-                new int[] { indexA, indexB },
-                new int[] { indexB, indexC },
-                new int[] { indexC, indexA }
-            };
-            foreach (int[] triangleEdge in triangleEdges)
-            {
-                bool ContainsEdge = false;
+            if (!AdjacencyList[A].contains(B))  AdjacencyList[A].Add(B); //A -> B
+            if (!AdjacencyList[A].contains(C))  AdjacencyList[A].Add(C); //A -> C
 
-                foreach (int[] edge in edges)
-                {
-                    if (edge[0] == triangleEdge[0] && edge[1] == triangleEdge[1] || edge[1] == triangleEdge[0] && edge[0] == edge[1])
-                        ContainsEdge = true;
-                }
-                if (ContainsEdge == false) edges.Add(triangleEdge);
-            }
+            if (!AdjacencyList[B].contains(A)) AdjacencyList[B].Add(A); //B -> A
+            if (!AdjacencyList[B].contains(C)) AdjacencyList[B].Add(C); //B -> C
 
+            if (!AdjacencyList[C].contains(A)) AdjacencyList[C].Add(A); //C -> A
+            if (!AdjacencyList[C].contains(B)) AdjacencyList[C].Add(B); //C -> B
         }
-        return edges.ToArray();
+
+        return AdjacencyList.ToArray();
     }
 
-    private static Triangle FindSuperTriagle(Vector2[] points)
+    private static Triangle FindSuperTriagle(Vector2[] positions, ref List<Point> points)
     {
         Vector2 triangleCenter = Vector2.zero;
         float triangleRadius = float.MinValue;
 
-        foreach (Vector2 vector in points)
+        foreach (Vector2 vector in positions)
             triangleCenter += vector;
-        triangleCenter /= points.Length;
+        triangleCenter /= positions.Length;
 
-        foreach (Vector2 vector in points)
+        foreach (Vector2 vector in positions)
         {
             float distance = Mathf.Sqrt(Mathf.Pow(vector.x - triangleCenter.x, 2) + Mathf.Pow(vector.y - triangleCenter.y, 2));
             if (distance > triangleRadius) triangleRadius = distance;
@@ -124,6 +120,10 @@ public static class DelaunayTriangulation
         Vector2 BottomLeft = new Vector2(triangleCenter.x - triangleRadius * Mathf.Tan(60 * Mathf.Deg2Rad), triangleCenter.y - triangleRadius);
         Vector2 BottomRight = new Vector2(triangleCenter.x + triangleRadius * Mathf.Tan(60 * Mathf.Deg2Rad), triangleCenter.y - triangleRadius);
 
+        points.Add(new Point(Top, -1));
+        points.Add(new Point(BottomLeft, -1));
+        points.Add(new Point(BottomRight, -1));
+
         Triangle superTriangle = new Triangle(Top, BottomLeft, BottomRight);
 
         return superTriangle;
@@ -131,14 +131,14 @@ public static class DelaunayTriangulation
 
     struct Triangle
     {
-        public Vector2[] Vertices;
+        public Point[] Vertices;
         public Vector2 Circumcenter;
 
         public float Radius;
 
-        public Triangle(Vector2 A, Vector2 B, Vector2 C)
+        public Triangle(Point A, Point B, Point C)
         {
-            Vertices = new Vector2[] { A, B, C };
+            Vertices = new Point[] { A, B, C };
 
             Circumcenter = new Vector2(0, 0);
             Radius = 0;
@@ -150,9 +150,9 @@ public static class DelaunayTriangulation
 
         Vector2 CalculateCircumCenter()
         {
-            Vector2 A = Vertices[0];
-            Vector2 B = Vertices[1];
-            Vector2 C = Vertices[2];
+            Vector2 A = Vertices[0].Position;
+            Vector2 B = Vertices[1].Position;
+            Vector2 C = Vertices[2].Position;
 
             float D = 2 * (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y));
 
@@ -164,7 +164,7 @@ public static class DelaunayTriangulation
 
         float CalculateRadius()
         {
-            return Mathf.Sqrt(Mathf.Pow(Vertices[0].x - Circumcenter.x, 2) + Mathf.Pow(Vertices[0].y - Circumcenter.y, 2));
+            return Mathf.Sqrt(Mathf.Pow(Vertices[0].Position.x - Circumcenter.x, 2) + Mathf.Pow(Vertices[0].Position.y - Circumcenter.y, 2));
         }
 
         public bool SharesVertex(Triangle triangle)
@@ -178,5 +178,16 @@ public static class DelaunayTriangulation
         }
     }
 
+    struct Point
+    {
+        public Vector2 Position;
+        public int Index;
+        
+        public Point(Vector2 Position, int Index)
+        {
+            this.Position = Position;
+            this.Index = Index;
+        } 
+    }
 }
 
