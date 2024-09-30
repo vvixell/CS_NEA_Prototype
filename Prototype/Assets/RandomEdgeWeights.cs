@@ -4,15 +4,18 @@ using UnityEngine;
 
 public static class RandomEdgeWeights
 {
-    public static int[] GetEdgeWeights(int seed, int EdgesCount)
+    public static void SetEdgeWeights(int seed, ref int[,] AdjacencyMatrix)
     {
         System.Random rng = new System.Random(seed);
-
-        int[] weights = new int[EdgesCount];
-
-        for (int i = 0; i < EdgesCount; i++)
-            weights[i] = rng.Next(1, 100);
-
-        return weights;
+        for(int a = 0; a < AdjacencyMatrix.GetLength(0); a++)
+        {
+            for(int b = 0; b < AdjacencyMatrix.GetLength(1); b++)
+            {
+                int weight = rng.Next(1, 100);
+                AdjacencyMatrix[a,b] *= weight;
+                AdjacencyMatrix[b,a] *= weight;
+            }
+        }
+        
     }
 }
