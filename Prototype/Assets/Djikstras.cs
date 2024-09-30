@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class Djikstras
 {
-    public int[] FindPath(int[][] AdjacencyList, int[] EdgeWeights, int StartNode, int TargetNode)
+    public int[] FindPath(int[,] AdjacencyMatrix, int StartNode, int TargetNode)
     {
         
     }   
