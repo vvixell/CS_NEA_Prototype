@@ -83,14 +83,22 @@ public static class DelaunayTriangulation
             int B = triangle.Vertices[1].Index;
             int C = triangle.Vertices[2].Index;
 
-            AdjacencyMatrix[A,B] = 1;
-            AdjacencyMatrix[B,A] = 1;
+            Vector2 a = positions[A];
+            Vector2 b = positions[B];
+            Vector2 b = positions[C];
             
-            AdjacencyMatrix[B,C] = 1;
-            AdjacencyMatrix[C,B] = 1;
+            int DistanceAB = (int)(Mathf.Sqrt((a.x - b.x )*(a.x - b.x) + (a.y - b.y )*(a.y - b.y))*100);
+            int DistanceBC = (int)(Mathf.Sqrt((b.x - c.x )*(b.x - c.x) + (b.y - c.y )*(b.y - c.y))*100);
+            int DistanceCA = (int)(Mathf.Sqrt((c.x - a.x )*(c.x - a.x) + (c.y - a.y )*(c.y - a.y))*100);
+                                
+            AdjacencyMatrix[A,B] = DistanceAB;
+            AdjacencyMatrix[B,A] = DistanceAB;
             
-            AdjacencyMatrix[C,A] = 1;
-            AdjacencyMatrix[B,C] = 1;
+            AdjacencyMatrix[B,C] = DistanceBC;
+            AdjacencyMatrix[C,B] = DistanceBC;
+            
+            AdjacencyMatrix[C,A] = DistanceCA;
+            AdjacencyMatrix[B,C] = DistanceCA;
         }
 
         return AdjacencyMatrix;
