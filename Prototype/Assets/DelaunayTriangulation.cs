@@ -5,7 +5,7 @@ using System.Linq;
 
 public static class DelaunayTriangulation
 {
-    public static int[][] Triangulate(Vector2[] positions)
+    public static int[,] Triangulate(Vector2[] positions)
     {
         List<Triangle> triangles = new List<Triangle>();
         List<Point> points = new List<Point> ();
@@ -76,27 +76,24 @@ public static class DelaunayTriangulation
         foreach (Triangle triangle in triangles.ToArray())
             if (triangle.SharesVertex(superTriangle)) triangles.Remove(triangle);
 
-        List<int>[] AdjacencyList = new List<int>[points.Length];
-        foreach(List<int> list in AdjacencyList)
-            list = new List<int>();
-
+        int[,] AdjacencyMatrix = new int[positions.Length,positions.Length];
         foreach (Triangle triangle in triangles)
         {
             int A = triangle.Vertices[0].Index;
             int B = triangle.Vertices[1].Index;
             int C = triangle.Vertices[2].Index;
 
-            if (!AdjacencyList[A].contains(B))  AdjacencyList[A].Add(B); //A -> B
-            if (!AdjacencyList[A].contains(C))  AdjacencyList[A].Add(C); //A -> C
-
-            if (!AdjacencyList[B].contains(A)) AdjacencyList[B].Add(A); //B -> A
-            if (!AdjacencyList[B].contains(C)) AdjacencyList[B].Add(C); //B -> C
-
-            if (!AdjacencyList[C].contains(A)) AdjacencyList[C].Add(A); //C -> A
-            if (!AdjacencyList[C].contains(B)) AdjacencyList[C].Add(B); //C -> B
+            AdjacencyMatrix[A,B] = 1;
+            AdjacencyMatrix[B,A] = 1;
+            
+            AdjacencyMatrix[B,C] = 1;
+            AdjacencyMatrix[C,B] = 1;
+            
+            AdjacencyMatrix[C,A] = 1;
+            AdjacencyMatrix[B,C] = 1;
         }
 
-        return AdjacencyList.ToArray();
+        return AdjacencyMatrix;
     }
 
     private static Triangle FindSuperTriagle(Vector2[] positions, ref List<Point> points)
