@@ -26,6 +26,21 @@ public class GraphGenerator : MonoBehaviour
         
         RandomEdgeWeights.SetEdgeWeights(Seed, ref AdjacencyMatrix);
 
+        int MainCavern = 0;
+
+        int[,] CaveAdjacencyMatrix = new int[Caverns.Length, Caverns.Length];
+
+        for(int i = 0; i < Cavens.Length; i++)
+        {
+            if(MainCavern == i) continue;
+            int[] Path = Djikstras.FindPath(AdjacencyMatrix, MainCavern, i);
+            for(int j = 1; j < Path.Length; j++)
+            {
+                CaveAdjacencyMatrix[Path[i], Path[i-1]] = 1;
+                CaveAdjacencyMatrix[Path[i-1], Path[i]] = 1;
+            }
+        }
+
         for (int i = 0; i < Points.Length; i++)
         {
             GameObject point = new GameObject($"{i} , {Points[i]}");
