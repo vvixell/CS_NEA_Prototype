@@ -22,7 +22,7 @@ public class GraphGenerator : MonoBehaviour
 
         int[] Caverns = DeleteRandomNodes.GetNewPointsIndexes(Seed, CavernCount, Points);
 
-        int[,] AdjacencyMatrix = DelaunayTriangulation.Triangulate(Caverns);
+        int[,] AdjacencyMatrix = DelaunayTriangulation.Triangulate(Points);
         
         RandomEdgeWeights.SetEdgeWeights(Seed, ref AdjacencyMatrix);
 
