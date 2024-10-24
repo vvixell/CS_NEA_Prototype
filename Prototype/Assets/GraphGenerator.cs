@@ -28,7 +28,7 @@ public class GraphGenerator : MonoBehaviour
 
         int MainCavern = 0;
 
-        int[,] CaveAdjacencyMatrix = GetCavePathAdjacencyMatrix(Caverns, AdjacencyMatrix, MainCavern);
+        int[,] CaveAdjacencyMatrix = Djikstras.GetCavePathAdjacencyMatrix(Caverns, AdjacencyMatrix, MainCavern);
 
         for (int i = 0; i < Points.Length; i++)
         {
