@@ -20,7 +20,7 @@ public class GraphGenerator : MonoBehaviour
     {
         Vector2[] Points = DiscSampling.GeneratePoints(Seed, new NoiseSettings(1000, 1, 0.5f, 2f), GraphSize, new int[] { DistanceBetweenCaverns / 2, DistanceBetweenCaverns });
 
-        Vector2[] Caverns = DeleteRandomNodes.GetNewPoints(Seed, CavernCount, Points);
+        int[] Caverns = DeleteRandomNodes.GetNewPointsIndexes(Seed, CavernCount, Points);
 
         int[,] AdjacencyMatrix = DelaunayTriangulation.Triangulate(Caverns);
         
