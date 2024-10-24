@@ -20,4 +20,23 @@ public static class DeleteRandomNodes
 
         return NewPoints.ToArray();
     }
+
+    public static int[] GetNewPointsIndexes(int seed, int NumberOfTotalPoints, Vector2[] points)
+    {
+        int[] Indexes = new int[points.Length];
+        for(int i = 0; i < points.Length; i++) Indexes[i] = i;
+        
+        List<int> Points = Indexes.ToList();
+        List<int> NewPoints = new List<Vector2>();
+
+        System.Random rng = new System.Random(seed);
+        for (int i = 0; i < NumberOfTotalPoints; i++)
+        {
+            int index = rng.Next(0, points.Length);
+            NewPoints.Add(points[i]);
+            Points.RemoveAt(i);
+        }
+
+        return NewPoints.ToArray();
+    }
 }
