@@ -15,7 +15,7 @@ public static class DelaunayTriangulation
 
         for (int i = 0; i < positions.Length; i++)
         {
-            Point point = new Point(points[i], i);
+            Point point = new Point(positions[i], i);
             points.Add(point);
 
             List<Triangle> encompassingTriangles = new List<Triangle>();
@@ -54,7 +54,7 @@ public static class DelaunayTriangulation
 
                         foreach (Point[] otherTriangleEdge in otherTriangleEdges)
                         {
-                            if ((edge[0] == otherTriangleEdge[0] && edge[1] == otherTriangleEdge[1]) || (edge[0] == otherTriangleEdge[1] && edge[1] == otherTriangleEdge[0]))
+                            if ((edge[0].Equals(otherTriangleEdge[0]) && edge[1].Equals(otherTriangleEdge[1])) || (edge[0].Equals(otherTriangleEdge[1]) && edge[1].Equals(otherTriangleEdge[0])))
                             {
                                 EdgeIsShared = true;
                                 break;
@@ -85,7 +85,7 @@ public static class DelaunayTriangulation
 
             Vector2 a = positions[A];
             Vector2 b = positions[B];
-            Vector2 b = positions[C];
+            Vector2 c = positions[C];
             
             int DistanceAB = (int)(Mathf.Sqrt((a.x - b.x )*(a.x - b.x) + (a.y - b.y )*(a.y - b.y))*100);
             int DistanceBC = (int)(Mathf.Sqrt((b.x - c.x )*(b.x - c.x) + (b.y - c.y )*(b.y - c.y))*100);
@@ -125,11 +125,14 @@ public static class DelaunayTriangulation
         Vector2 BottomLeft = new Vector2(triangleCenter.x - triangleRadius * Mathf.Tan(60 * Mathf.Deg2Rad), triangleCenter.y - triangleRadius);
         Vector2 BottomRight = new Vector2(triangleCenter.x + triangleRadius * Mathf.Tan(60 * Mathf.Deg2Rad), triangleCenter.y - triangleRadius);
 
-        points.Add(new Point(Top, -1));
-        points.Add(new Point(BottomLeft, -1));
-        points.Add(new Point(BottomRight, -1));
+        Point TopPoint = new Point(Top, -1);
+        Point BottomLeftPoint = new Point(BottomLeft, -1);
+        Point BottomRightPoint = new Point(BottomRight, -1);
+        points.Add(TopPoint);
+        points.Add(BottomLeftPoint);
+        points.Add(BottomRightPoint);
 
-        Triangle superTriangle = new Triangle(Top, BottomLeft, BottomRight);
+        Triangle superTriangle = new Triangle(TopPoint, BottomLeftPoint, BottomRightPoint);
 
         return superTriangle;
     }

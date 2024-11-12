@@ -27,14 +27,14 @@ public static class DeleteRandomNodes
         for(int i = 0; i < points.Length; i++) Indexes[i] = i;
         
         List<int> Points = Indexes.ToList();
-        List<int> NewPoints = new List<Vector2>();
+        List<int> NewPoints = new List<int>();
 
-        System.Random rng = new System.Random(seed);
+        System.Random rng = new System.Random(seed + 1);
         for (int i = 0; i < NumberOfTotalPoints; i++)
         {
-            int index = rng.Next(0, points.Length);
-            NewPoints.Add(points[i]);
-            Points.RemoveAt(i);
+            int index = rng.Next(0, Points.Count);
+            NewPoints.Add(Points[index]);
+            Points.RemoveAt(index);
         }
 
         return NewPoints.ToArray();

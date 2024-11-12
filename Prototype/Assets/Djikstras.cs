@@ -4,17 +4,23 @@ using UnityEngine;
 
 public static class Djikstras
 {
-    public int[] FindPath(int[,] AdjacencyMatrix, int StartNode, int TargetNode)
+    public static int[] FindPath(int[,] AdjacencyMatrix, int StartNode, int TargetNode)
     {
+        //Create New list of empty nodes
         Node[] Nodes = new Node[AdjacencyMatrix.GetLength(0)];
         for(int i = 0; i < Nodes.Length; i++) Nodes[i] = new Node(i);
         
+        //Set all nodes distances to infinity
         int[] NodeDistances = new int[AdjacencyMatrix.GetLength(0)];
-        foreach(int distance in NodeDistances) distance = int.MaxValue;
+        for (int i = 0; i < NodeDistances.Length; i++)
+            NodeDistances[i] = int.MaxValue;
+
+        //Set the distance of the start node to 0
         NodeDistances[StartNode] = 0;
 
+        //Add all nodes to unvisited node list
         List<int> UnvisitedNodes = new List<int>();
-        for(int i = 0; i < AdjacencyMatrix.GetLength(0); i++) UnvisitedNodes.Add(i);
+        for(int i = 0; i < Nodes.Length; i++) UnvisitedNodes.Add(i);
        
         while(UnvisitedNodes.Count > 0)
         {
@@ -22,18 +28,18 @@ public static class Djikstras
 
             int[] UnvisitedNeighbours = GetAllUnvisitedNeighbours(AdjacencyMatrix, UnvisitedNodes, CurrentNode);
 
-            for(int i = 0; i < UnvisitedNeighbours.Length; i++)
+            for (int i = 0; i < UnvisitedNeighbours.Length; i++)
             {
                 int Neighbour = UnvisitedNeighbours[i];
                 int NewPathDistance = NodeDistances[CurrentNode] + AdjacencyMatrix[CurrentNode, Neighbour];
-                if(NewPathDistance < NodeDistances[Neighbour]) 
+                if (NewPathDistance < NodeDistances[Neighbour]) 
                 {
                     NodeDistances[Neighbour] = NewPathDistance;
-                    Nodes[Neighbour].Parent = Nodes[CurrentNode];
+                    Nodes[Neighbour].ParentNode = Nodes[CurrentNode];
                 }
             }
 
-            UnvistedNodes.Remove(CurrentNode);
+            UnvisitedNodes.Remove(CurrentNode);
         }
 
         List<int> ShortestPath = new List<int>();
@@ -42,7 +48,7 @@ public static class Djikstras
         while(!CurrentPathNode.IsStartNode)
         {
             ShortestPath.Add(CurrentPathNode.Index);
-            CurrentPathNode = CurrentPathNode.Parent;
+            CurrentPathNode = CurrentPathNode.ParentNode;
         }
         ShortestPath.Add(StartNode);
         ShortestPath.Reverse();
@@ -50,62 +56,61 @@ public static class Djikstras
         return ShortestPath.ToArray();
     }   
 
-    int FindClosestUnvisitedNode(int[] NodeDistances, List<int> UnvisitedNodes)
+    static int FindClosestUnvisitedNode(int[] NodeDistances, List<int> UnvisitedNodes)
     {
         int ClosestNode = UnvisitedNodes[0];
         for(int i = 0; i < NodeDistances.Length; i++)
         {
-            if(!UnvisitedNodes.Contains(i)) continue;
-               
-            if(NodeDistances[i] < NodeDistances[ClosestNode]) ClosestNode = i;
+            if (UnvisitedNodes.Contains(i)) 
+            { 
+                if (NodeDistances[i] < NodeDistances[ClosestNode]) ClosestNode = i; 
+            }
         }
         return ClosestNode;
     }
-    
-    int[] GetAllUnvisitedNeighbours(int[,] AdjacencyMatrix, List<int> UnvisitedNodes, int CurrentNode)
+
+    static int[] GetAllUnvisitedNeighbours(int[,] AdjacencyMatrix, List<int> UnvisitedNodes, int CurrentNode)
     {
         List<int> Neighbours = new List<int>();
         int TotalNodes = AdjacencyMatrix.GetLength(0);
         
         for(int i = 0; i < TotalNodes; i++)
         {
-            if(i == CurrentNode || !UnvisitedNodes.Contains(i)) continue;
-            
-            if(AdjacencyMatrix[CurrentNode, i] != -1) Neighbours.Add(i);
+            if (i != CurrentNode && UnvisitedNodes.Contains(i))
+            {
+                if (AdjacencyMatrix[CurrentNode, i] != 0) Neighbours.Add(i);
+            }
         }
         return Neighbours.ToArray();
     }
 
-    public int[,] GetCavePathAdjacencyMatrix(Vector2 Caverns, int[,] AdjacencyMatrix, int MainCavern)
+    public static int[,] GetCavePathAdjacencyMatrix(Vector2[] Points, int[] Caverns, int[,] AdjacencyMatrix, int MainCavern)
     {
-        int[,] CaveAdjacencyMatrix = new int[Caverns.Length, Caverns.Length];
-
+        int[,] CaveAdjacencyMatrix = new int[Points.Length, Points.Length];
         for(int i = 0; i < Caverns.Length; i++)
         {
             if(MainCavern == i) continue;
-            int[] Path = Djikstras.FindPath(AdjacencyMatrix, MainCavern, i);
+            int[] Path = Djikstras.FindPath(AdjacencyMatrix, MainCavern, Caverns[i]);
             for(int j = 1; j < Path.Length; j++)
             {
-                CaveAdjacencyMatrix[Path[i], Path[i-1]] = 1;
-                CaveAdjacencyMatrix[Path[i-1], Path[i]] = 1;
+                CaveAdjacencyMatrix[Path[j], Path[j-1]] = 1;
+                CaveAdjacencyMatrix[Path[j-1], Path[j]] = 1;
             }
         }
-    }
-    
-    struct Node
-    {
-        public int Index;
-        public Node ParentNode;
-        public bool IsStartNode {  get => ParentNode == null; }
-        
-        public Node(int Index)
-        {
-            this.Index = Index;
-        }
 
-        public bool IsStartNode()
-        {
-            Return
-        }
+        return CaveAdjacencyMatrix;
     }
+}
+
+public class Node
+{
+    public int Index;
+    public Node ParentNode;
+
+    public Node(int Index)
+    {
+        this.Index = Index;
+    }
+
+    public bool IsStartNode { get => ParentNode == null; }
 }
