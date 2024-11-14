@@ -84,17 +84,22 @@ public static class Djikstras
         return Neighbours.ToArray();
     }
 
-    public static int[,] GetCavePathAdjacencyMatrix(Vector2[] Points, int[] Caverns, int[,] AdjacencyMatrix, int MainCavern)
+    public static int[,] GetCavePathAdjacencyMatrix(Vector2[] Points, int[] Caverns, int[,] AdjacencyMatrix, int MainCavern, bool ExistingPathWeight, float ExistingPathWeightMultiplier)
     {
         int[,] CaveAdjacencyMatrix = new int[Points.Length, Points.Length];
         for(int i = 0; i < Caverns.Length; i++)
         {
-            if(MainCavern == i) continue;
+            if(MainCavern == Caverns[i]) continue;
             int[] Path = Djikstras.FindPath(AdjacencyMatrix, MainCavern, Caverns[i]);
             for(int j = 1; j < Path.Length; j++)
             {
                 CaveAdjacencyMatrix[Path[j], Path[j-1]] = 1;
                 CaveAdjacencyMatrix[Path[j-1], Path[j]] = 1;
+                if (ExistingPathWeight)
+                {
+                    AdjacencyMatrix[Path[j], Path[j - 1]] = (int)(AdjacencyMatrix[Path[j], Path[j - 1]] * ExistingPathWeightMultiplier);
+                    AdjacencyMatrix[Path[j-1], Path[j]] = (int)(AdjacencyMatrix[Path[j - 1], Path[j]]  * ExistingPathWeightMultiplier);
+                }
             }
         }
 

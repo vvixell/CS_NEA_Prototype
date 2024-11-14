@@ -5,7 +5,7 @@ using System.Linq;
 
 public static class PerlinNoise
 {
-    public static float[,] CreateNoiseMap(int Seed, Vector2Int Size, NoiseSettings settings)
+    public static float[,] CreateNoiseMap(int Seed, Vector2Int Size, NoiseSettings settings, bool FallOff)
     {
         float[,] noiseMap = new float[Size.x, Size.y];
 
