@@ -10,6 +10,9 @@ public class MenuManager : MonoBehaviour
     public enum Algorithm { Perlin, Automata, Graphs };
     public Algorithm CurrentAlgorithm = Algorithm.Perlin;
 
+    [Header("General")]
+
+    public TextMeshProUGUI timeTakenText;
 
     [Header("Perlin Noise")]
     public GameObject PerlinNoise_SettingsTab;
@@ -185,6 +188,8 @@ public class MenuManager : MonoBehaviour
                 ProceduralGraphs_SettingsTab.SetActive(true);
                 break;
         }
+
+        timeTakenText.text = string.Empty;
     }
 
 
@@ -425,7 +430,8 @@ public class MenuManager : MonoBehaviour
 
     public void Generate()
     {
-        switch(CurrentAlgorithm)
+        DateTime startTime = DateTime.Now;
+        switch (CurrentAlgorithm)
         {
             case Algorithm.Perlin:
                 GenerateNoise();
@@ -436,6 +442,7 @@ public class MenuManager : MonoBehaviour
                 GenerateProceduralGraphs();
                 break;
         }
+        timeTakenText.text = $"Time Taken: {DateTime.Now.Subtract(startTime).TotalMilliseconds.ToString()}ms";
     }
     public void GenerateRandSeed()
     {

@@ -18,7 +18,7 @@ public class NoiseAlgo : MonoBehaviour
         {
             for (int x = 0; x < MapSize; x++)
             {
-                texture.SetPixel(x, y, Color.Lerp(Color.black, Color.white, noiseMap[x, y] > CuttOff ? 1 : 0));
+                texture.SetPixel(x, y, noiseMap[x, y] > CuttOff ? Color.white : Color.black);
             }
         }
 

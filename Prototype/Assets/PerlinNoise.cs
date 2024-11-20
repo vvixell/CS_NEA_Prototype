@@ -45,13 +45,23 @@ public static class PerlinNoise
                 else if (height > highestValue) highestValue = height;
             }
         }
-
+        AnimationCurve falloffCurve = new AnimationCurve(new Keyframe(0,0), new Keyframe(0.5f, 1), new Keyframe(1,1));
         for (int y = 0; y < Size.y; y++)
         {
             for (int x = 0; x < Size.x; x++)
             {
                 float height = noiseMap[x, y];
                 noiseMap[x, y] = Mathf.InverseLerp(lowestValue, highestValue, height);
+                if (FallOff)
+                {
+                    float centerX = Size.x / 2f;
+                    float centerY = Size.y / 2f;
+                    float A = x - centerX;
+                    float B = y - centerY;
+                    float DistanceFromCenter = Mathf.Sqrt(A * A + B * B);
+                    float Multipler = falloffCurve.Evaluate(1 - Mathf.Clamp01(DistanceFromCenter / (Mathf.Min(Size.y, Size.x) / 2f)));
+                    noiseMap[x, y] *= Multipler;
+                }
             }
         }
         return noiseMap;
